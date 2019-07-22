@@ -22,7 +22,7 @@ def m_ode(m, i, k):
     else:
         return Constraint.Skip
 
-
+# component balances
 def x_ode(m, i, k):
     if i > 0 and 1 < k < m.Ntray:
         return m.M[i, k] * m.xdot[i, k] == \
@@ -84,7 +84,7 @@ def ghb(m, i):
     else:
         return Constraint.Skip
 
-
+#: heat balance
 def ghc(m, i):
     if i > 0:
         return m.M[i, m.Ntray] * (m.xdot[i, m.Ntray] * ((m.hlm0 - m.hln0) * m.T[i, m.Ntray]**3 +
@@ -99,7 +99,7 @@ def ghc(m, i):
     else:
         return Constraint.Skip
 
-
+#: liquid enthalpy
 def hkl(m, i, k):
     if i > 0:
         return m.hl[i, k] == m.x[i, k]*(m.hlm0*m.T[i, k]**3 + m.hlma * m.T[i, k]**2 + m.hlmb * m.T[i, k] + m.hlmc) +\
@@ -107,7 +107,7 @@ def hkl(m, i, k):
     else:
         return Constraint.Skip
 
-
+#: vapor enthalpy
 def hkv(m, i, k):
     if i > 0 and k < m.Ntray:
         return m.hv[i, k] == m.y[i, k] * (m.hlm0 * m.T[i, k]**3 + m.hlma * m.T[i, k]**2 + m.hlmb * m.T[i, k] +
@@ -129,14 +129,14 @@ def hkv(m, i, k):
     else:
         return Constraint.Skip
 
-
+#: sat press
 def lpm(m, i, k):
     if i > 0:
         return m.pm[i, k] == exp(m.CapAm - m.CapBm/(m.T[i, k] + m.CapCm))
     else:
         return Constraint.Skip
 
-
+#: sat press
 def lpn(m, i, k):
     if i > 0:
         return m.pn[i, k] == exp(m.CapAn - m.CapBn/(m.T[i, k] + m.CapCn))
@@ -144,14 +144,14 @@ def lpn(m, i, k):
     else:
         return Constraint.Skip
 
-
+#: total p
 def dp(m, i, k):
     if i > 0:
         return m.p[k] == m.pm[i, k] * m.x[i, k] + (1 - m.x[i, k]) * m.pn[i, k]
     else:
         return Constraint.Skip
 
-
+#: t dummy diff eq
 def lTdot(m, i, k):
     if i > 0:
         return m.Tdot[i, k] == \
@@ -163,14 +163,14 @@ def lTdot(m, i, k):
     else:
         return Constraint.Skip
 
-
+#: eq tray 1
 def gy0(m, i):
     if i > 0:
         return m.p[1] * m.y[i, 1] == m.x[i, 1] * m.pm[i, 1]
     else:
         return Constraint.Skip
 
-
+#: eq tray 1< tray < ntray
 def gy(m, i, k):
     if i > 0 and 1 < k < m.Ntray:
         return m.y[i, k] == \
@@ -178,49 +178,49 @@ def gy(m, i, k):
     else:
         return Constraint.Skip
 
-
+#: volume
 def dMV(m, i, k):
     if i > 0 and 1 < k < m.Ntray:
         return m.Mv[i, k] == m.Vm[i, k] * m.M[i, k]
     else:
         return Constraint.Skip
 
-
+#: volume 1
 def dMv1(m, i):
     if i > 0:
         return m.Mv1[i] == m.Vm[i, 1] * m.M[i, 1]
     else:
         return Constraint.Skip
 
-
+#: volume N
 def dMvn(m, i):
     if i > 0:
         return m.Mvn[i] == m.Vm[i, m.Ntray] * m.M[i, m.Ntray]
     else:
         return Constraint.Skip
 
-
+#: liquid out of tray
 def hyd(m, i, k):
     if i > 0 and 1 < k < m.Ntray:
         return m.L[i, k] * m.Vm[i, k] == 0.166 * (m.Mv[i, k] - 0.155) ** 1.5
     else:
         return Constraint.Skip
 
-
+#: liquid ot of tray 1
 def hyd1(m, i):
     if i > 0:
         return m.L[i, 1] * m.Vm[i, 1] == 0.166 * (m.Mv1[i] - 8.5) ** 1.5
     else:
         return Constraint.Skip
 
-
+#: liquid out of tray N
 def hydN(m, i):
     if i > 0:
         return m.L[i, m.Ntray] * m.Vm[i, m.Ntray] == 0.166 * (m.Mvn[i] - 0.17) ** 1.5
     else:
         return Constraint.Skip
 
-
+#: molar volume
 def dvm(m, i, k):
     if i > 0:
         return m.Vm[i, k] == m.x[i, k] * ((1/2288) * 0.2685**(1 + (1 - m.T[i, k]/512.4)**0.2453)) + \
@@ -242,8 +242,9 @@ mod = ConcreteModel()
 
 mod.t = ContinuousSet(bounds=(0, 1))
 mod.Ntray = Ntray = 42
-
+#: trays
 mod.tray = Set(initialize=[i for i in range(1, mod.Ntray + 1)])
+#: params
 mod.feed = Param(mod.tray,
                   initialize=lambda m, k: 57.5294 if k == 21 else 0.0,
                   mutable=True)
