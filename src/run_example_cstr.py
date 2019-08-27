@@ -51,7 +51,7 @@ def main():
                     pass
 
     mod.o = Objective(expr=1, sense=minimize)
-    ip = SolverFactory("/home/dav0/apps/ipopt-build-vanilla/bin/ipopt")  #: Ipopt's executable binary goes here.
+    ip = SolverFactory("ipopt")  #: Ipopt's executable binary goes here.
     res = ip.solve(mod, tee=True, symbolic_solver_labels=True)
     if res.solver.status == SolverStatus.ok and res.solver.termination_condition == TerminationCondition.optimal:
         print("Good")

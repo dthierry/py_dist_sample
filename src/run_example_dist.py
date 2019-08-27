@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 # -*- coding:utf:8 -*-
 
-from model.dmod import mod
+from dist.dmod import mod
 from pyomo.environ import *
 from pyomo.dae import *
 from pyomo.opt import TerminationCondition, SolverFactory, SolverStatus
@@ -78,7 +78,7 @@ def main():
     #: Set up a dummy objective.
     mod.o = Objective(expr=(mod.u2[mod.t.last()] - value(mod.Qr[mod.t.last()])) ** 2)
     #: Set up ipopt.
-    ip = SolverFactory("/home/dav0/apps/ipopt-build-vanilla/bin/ipopt")  #: Ipopt's executable binary goes here.
+    ip = SolverFactory("ipopt")  #: Ipopt's executable binary goes here.
     ip.options["halt_on_ampl_error"] = "yes"
     ip.options["linear_solver"] = "ma57"
     res = ip.solve(mod, tee=True, symbolic_solver_labels=True)
